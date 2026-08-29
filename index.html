@@ -802,7 +802,8 @@
                 <button class="preset-option" type="button" data-session-key="lateral thinking">Lateral Thinking</button>
                 <button class="preset-option" type="button" data-session-key="problem solving">Problem Solving</button>
                 <button class="preset-option" type="button" data-session-key="creativity">Creativity</button>
-                <button class="preset-option" type="button" data-session-key="acuity senses">Acuity Senses</button>
+                <button class="preset-option" type="button" data-session-key="hypnagogic theta">Hypnagogic Theta</button>
+                <button class="preset-option" type="button" data-session-key="complete theta session">Complete Theta Session</button>
                 <button class="preset-option" type="button" data-session-key="sharper senses and acuity thinking">Sharper Senses &amp; Acuity Thinking</button>
                 <button class="preset-option" type="button" data-session-key="clear brain fog">Clear Brain Fog</button>
                 <button class="preset-option" type="button" data-session-key="focus">Calm Focus</button>
@@ -1076,17 +1077,31 @@
         morphicBase: 120,
         scalarCarrier: 136.1
       },
-      "acuity senses": {
-        title: "Acuity Senses",
-        recommended: 12,
-        note: "A bright alertness preset for sensory clarity, with crisp upper tones and a gentle beta-style offset.",
-        carrier: [417, 528, 639, 741, 852, 963],
-        binaural: 15,
-        ambient: 0.18,
-        morphic: 0.12,
-        scalar: 0.12,
-        morphicBase: 150,
-        scalarCarrier: 144
+      "hypnagogic theta": {
+        title: "Hypnagogic Theta",
+        recommended: 18,
+        note: "A slow, spacious theta preset for the relaxed transition between wakefulness and sleep. Do not use while driving or when alertness is required.",
+        carrier: [174, 285, 396, 432],
+        binaural: 4.5,
+        ambient: 0.34,
+        morphic: 0.08,
+        scalar: 0.06,
+        morphicBase: 96,
+        scalarCarrier: 111
+      },
+      "complete theta session": {
+        title: "Complete Theta Session",
+        recommended: 20,
+        note: "A phased theta journey that gradually moves from 8 Hz toward 4 Hz, then settles at 6 Hz for a gentle close.",
+        carrier: [174, 285, 396, 432, 528, 639],
+        binaural: 8,
+        ambient: 0.31,
+        morphic: 0.10,
+        scalar: 0.07,
+        morphicBase: 108,
+        scalarCarrier: 128,
+        phaseMode: "theta",
+        thetaPhases: [8, 7, 6, 5, 4, 6]
       },
       "sharper senses and acuity thinking": {
         title: "Sharper Senses & Acuity Thinking",
@@ -1154,7 +1169,8 @@
       "lateral thinking",
       "problem solving",
       "creativity",
-      "acuity senses",
+      "hypnagogic theta",
+      "complete theta session",
       "sharper senses and acuity thinking",
       "clear brain fog",
       "focus",
@@ -1360,6 +1376,23 @@
       }
 
       if (
+        clean.includes("hypnagogic") ||
+        clean.includes("between wakefulness and sleep") ||
+        clean.includes("falling asleep")
+      ) {
+        return GOAL_PRESETS["hypnagogic theta"];
+      }
+
+      if (
+        clean.includes("complete theta") ||
+        clean.includes("theta journey") ||
+        clean.includes("theta session") ||
+        clean === "theta"
+      ) {
+        return GOAL_PRESETS["complete theta session"];
+      }
+
+      if (
         clean.includes("sharper senses") ||
         clean.includes("acuity thinking") ||
         clean.includes("sharp thinking")
@@ -1374,7 +1407,7 @@
         clean.includes("alert") ||
         clean.includes("sharp")
       ) {
-        return GOAL_PRESETS["acuity senses"];
+        return GOAL_PRESETS["sharper senses and acuity thinking"];
       }
 
       if (
@@ -1476,12 +1509,16 @@
       syncPresetMenu();
       recommendedText.textContent = "Recommended for this preset: " + preset.recommended + " minutes.";
 
+      const binauralDescription = preset.phaseMode === "theta"
+        ? "theta sweep 8 → 7 → 6 → 5 → 4 → 6 Hz"
+        : "binaural " + preset.binaural + " Hz";
+
       waveLabel.textContent =
         "Solfeggio: " +
         preset.carrier.join(" Hz + ") +
-        " Hz | binaural " +
-        preset.binaural +
-        " Hz | harmonic base " +
+        " Hz | " +
+        binauralDescription +
+        " | harmonic base " +
         Math.round(preset.morphicBase || 111) +
         " Hz | pulse carrier " +
         Math.round(preset.scalarCarrier || 136.1) +
@@ -1552,6 +1589,12 @@
           } else {
             phaseNote.textContent = "Gamma phase 5: full 40–100 Hz blend";
           }
+        } else if (preset.phaseMode === "theta" && audioCtx) {
+          const phases = preset.thetaPhases || [8, 7, 6, 5, 4, 6];
+          const elapsed = Math.max(0, totalSeconds - remaining);
+          const phaseIndex = Math.min(phases.length - 1, Math.floor((elapsed / totalSeconds) * phases.length));
+          const labels = ["settling", "drifting", "deepening", "threshold", "deep theta", "gentle integration"];
+          phaseNote.textContent = "Theta phase " + (phaseIndex + 1) + ": " + phases[phaseIndex] + " Hz · " + labels[phaseIndex];
         }
 
         if (remaining <= FADE_OUT_SECONDS && remaining > 0) {
@@ -1777,6 +1820,19 @@
       left.start();
       right.start();
 
+      if (preset.phaseMode === "theta") {
+        const phases = preset.thetaPhases || [8, 7, 6, 5, 4, 6];
+        const phaseDuration = totalSeconds / phases.length;
+        const transitionSeconds = Math.min(4, phaseDuration * 0.12);
+        right.frequency.cancelScheduledValues(now);
+        right.frequency.setValueAtTime(base + phases[0], now);
+        phases.slice(1).forEach((hz, index) => {
+          const phaseStart = now + phaseDuration * (index + 1);
+          right.frequency.setValueAtTime(base + phases[index], phaseStart);
+          right.frequency.linearRampToValueAtTime(base + hz, phaseStart + transitionSeconds);
+        });
+      }
+
       // Slow modulation on its own gain stage. This keeps 0% master volume truly silent.
       const lfo = ctx.createOscillator();
       const lfoGain = ctx.createGain();
@@ -1884,7 +1940,9 @@
       if (phaseNote) {
         phaseNote.textContent = preset.phaseMode === "gamma"
           ? "Gamma phase 1: 40–48 Hz low gamma opening"
-          : "Phase: continuous blend";
+          : preset.phaseMode === "theta"
+            ? "Theta phase 1: 8 Hz · settling"
+            : "Phase: continuous blend";
       }
       statusEl.textContent = "Playing: " + preset.title + " — session will fade out and stop automatically.";
       startBtn.disabled = true;
@@ -2164,7 +2222,9 @@
     }
 
     function ensureIntegralSession() {
-      const sessions = getSavedSessions();
+      let sessions = getSavedSessions();
+      const originalCount = sessions.length;
+      sessions = sessions.filter(session => session.title !== "Acuity Senses");
       const starterSessions = [
         { goal: "Gamma Complete Session", key: "gamma complete session", potency: 4 },
         { goal: "Integral complete health", key: "integral complete health", potency: 5 },
@@ -2173,12 +2233,13 @@
         { goal: "Lateral Thinking", key: "lateral thinking", potency: 4 },
         { goal: "Problem Solving", key: "problem solving", potency: 5 },
         { goal: "Creativity", key: "creativity", potency: 4 },
-        { goal: "Acuity Senses", key: "acuity senses", potency: 4 },
+        { goal: "Hypnagogic Theta", key: "hypnagogic theta", potency: 3 },
+        { goal: "Complete Theta Session", key: "complete theta session", potency: 3 },
         { goal: "Sharper Senses & Acuity Thinking", key: "sharper senses and acuity thinking", potency: 4 },
         { goal: "Clear Brain Fog", key: "clear brain fog", potency: 4 }
       ];
 
-      let changed = false;
+      let changed = sessions.length !== originalCount;
 
       starterSessions.forEach((starter, index) => {
         const starterPreset = GOAL_PRESETS[starter.key];
