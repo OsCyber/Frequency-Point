@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frequency Point</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: #0f172a;
+      --panel2: #020617;
+      --border: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --soft: #334155;
+      --green: #34d399;
+      --rose: #fb7185;
+      --white: #f8fafc;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(52, 211, 153, 0.14), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.12), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      padding: 24px 0 28px;
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      color: #cbd5e1;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 54px);
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin: 14px auto 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.86);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+      padding: 24px;
+    }
+
+    label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      width: 100%;
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #64748b;
+      box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.25);
+    }
+
+    .preset-menu {
+      margin-top: 16px;
+      position: relative;
+    }
+
+    .preset-toggle {
+      width: 100%;
+      border: 1px solid #334155;
+      background: var(--panel2);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    .preset-toggle::after {
+      content: "▾";
+      color: #cbd5e1;
+      font-size: 14px;
+      transition: transform 0.18s ease;
+    }
+
+    .preset-menu.open .preset-toggle::after {
+      transform: rotate(180deg);
+    }
+
+    .preset-panel {
+      display: none;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.98);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.32);
+      z-index: 5;
+    }
+
+    .preset-menu.open .preset-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .preset-group-title {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      margin: 2px 0 8px;
+    }
+
+    .preset-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .preset-option {
+      border: 1px solid #1e293b;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .preset-option.active {
+      border-color: var(--green);
+      background: rgba(52, 211, 153, 0.14);
+      color: #bbf7d0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .btn-light {
+      background: var(--white);
+      color: #020617;
+    }
+
+    .btn-play {
+      background: var(--green);
+      color: #022c22;
+      min-width: 150px;
+    }
+
+    .btn-stop {
+      background: var(--rose);
+      color: #4c0519;
+      min-width: 150px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .control {
+      border: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.72);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .control-title {
+      color: #cbd5e1;
+      font-size: 15px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .experimental-control {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin: -8px 0 24px;
+      padding: 16px 18px;
+      border: 1px solid #365314;
+      border-radius: 18px;
+      background: rgba(101, 163, 13, 0.08);
+    }
+
+    .experimental-copy {
+      flex: 1;
+    }
+
+    .experimental-title {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: #ecfccb;
+      font-weight: 800;
+    }
+
+    .experimental-badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #365314;
+      color: #d9f99d;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .switch {
+      position: relative;
+      flex: 0 0 auto;
+      width: 52px;
+      height: 30px;
+      margin: 2px 0 0;
+    }
+
+    .switch input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .switch-track {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      border: 1px solid #475569;
+      border-radius: 999px;
+      background: #1e293b;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #f8fafc;
+      transition: transform 0.2s ease;
+    }
+
+    .switch input:checked + .switch-track {
+      border-color: var(--green);
+      background: #047857;
+    }
+
+    .switch input:checked + .switch-track::after {
+      transform: translateX(22px);
+    }
+
+    .switch input:focus-visible + .switch-track {
+      outline: 3px solid rgba(52, 211, 153, 0.55);
+      outline-offset: 2px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #cbd5e1;
+    }
+
+    .value {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 10px 0 4px;
+    }
+
+    .help {
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .side h2 {
+      margin: 4px 0 16px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    .small-title {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .wave-box {
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 14px 0;
+    }
+
+    .wave-label {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 18px;
+    }
+
+    .chip {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .warning {
+      border-top: 1px solid var(--border);
+      margin-top: 18px;
+      padding-top: 16px;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .timer-display {
+      margin-top: 18px;
+      border: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.72);
+      border-radius: 18px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .timer-label {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .timer-time {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .fade-note {
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .phase-note {
+      color: #cbd5e1;
+      font-size: 13px;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+
+    .status {
+      margin-top: 16px;
+      color: #a7f3d0;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .library {
+      margin-top: 18px;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+    }
+
+    .library-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .library-toggle {
+      width: 100%;
+      border: 1px solid #334155;
+      background: var(--panel2);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .library-toggle::after {
+      content: "▾";
+      color: #cbd5e1;
+      font-size: 14px;
+      transition: transform 0.18s ease;
+    }
+
+    .library.open .library-toggle::after {
+      transform: rotate(180deg);
+    }
+
+    .library-panel {
+      display: none;
+    }
+
+    .library.open .library-panel {
+      display: block;
+    }
+
+    .library-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .session-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .session-name {
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .session-detail {
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .btn-small {
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+
+    .btn-delete {
+      background: #3f1d2a;
+      color: #fecdd3;
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+    }
+
+    .playlist {
+      margin-top: 18px;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+    }
+
+    .playlist-actions,
+    .transport {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .playlist-actions button,
+    .transport button {
+      flex: 1 1 120px;
+    }
+
+    .playlist-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .playlist-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(2, 6, 23, 0.72);
+    }
+
+    .playlist-item.active {
+      border-color: var(--green);
+      background: rgba(52, 211, 153, 0.09);
+    }
+
+    .playlist-number {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+    }
+
+    .now-playing {
+      color: #a7f3d0;
+      font-size: 13px;
+      min-height: 20px;
+      margin-bottom: 10px;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid rgba(52, 211, 153, 0.55);
+      outline-offset: 2px;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    @media (max-width: 800px) {
+      body { padding: 14px; }
+      .grid, .controls { grid-template-columns: 1fr; }
+      .row { flex-direction: column; }
+      .preset-options { grid-template-columns: 1fr; }
+      button { width: 100%; }
+    }
+  </style>
+  <style>
+    /* Soft turquoise theme with tactile, subtly illuminated controls. */
+    :root {
+      --bg: #03181c;
+      --panel: #0a2930;
+      --panel2: #061e23;
+      --border: #1f5961;
+      --text: #ecfeff;
+      --muted: #9bc8cc;
+      --soft: #36737a;
+      --green: #5eead4;
+      --rose: #fda4af;
+      --white: #d9fffb;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 12% 5%, rgba(94, 234, 212, 0.18), transparent 31%),
+        radial-gradient(circle at 88% 85%, rgba(45, 212, 191, 0.12), transparent 38%),
+        linear-gradient(145deg, #03181c 0%, #08272d 54%, #041a20 100%);
+    }
+
+    .pill {
+      border-color: rgba(153, 246, 228, 0.28);
+      background: rgba(10, 63, 69, 0.72);
+      color: #c9fffa;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 24px rgba(45, 212, 191, 0.08);
+    }
+
+    h1 {
+      color: #effffe;
+      text-shadow: 0 0 34px rgba(94, 234, 212, 0.15);
+    }
+
+    .card {
+      border-color: rgba(94, 234, 212, 0.19);
+      background: linear-gradient(145deg, rgba(13, 50, 57, 0.92), rgba(6, 31, 36, 0.9));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 22px 65px rgba(0, 12, 15, 0.42),
+        0 0 40px rgba(45, 212, 191, 0.035);
+    }
+
+    label, .control-title, .wave-label, .phase-note { color: #c4e9e8; }
+
+    input[type="text"],
+    .preset-toggle,
+    .library-toggle {
+      border-color: #28636a;
+      background: rgba(4, 27, 32, 0.88);
+      box-shadow: inset 0 2px 7px rgba(0, 0, 0, 0.23);
+    }
+
+    input[type="text"]:focus {
+      border-color: #5eead4;
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.16), 0 0 18px rgba(45, 212, 191, 0.11);
+    }
+
+    .preset-panel {
+      border-color: #28636a;
+      background: rgba(3, 24, 28, 0.98);
+      box-shadow: 0 22px 50px rgba(0, 8, 10, 0.5), 0 0 25px rgba(45, 212, 191, 0.06);
+    }
+
+    .preset-option,
+    .btn-secondary,
+    .btn-small {
+      border-color: #28636a;
+      background: linear-gradient(180deg, #174950, #0d353b);
+      color: #d9f7f6;
+    }
+
+    .preset-option.active {
+      border-color: #5eead4;
+      background: linear-gradient(180deg, rgba(45, 212, 191, 0.26), rgba(13, 80, 82, 0.42));
+      color: #d5fffa;
+      box-shadow: inset 0 0 16px rgba(94, 234, 212, 0.08);
+    }
+
+    button {
+      position: relative;
+      transform: translateY(0);
+      transition: transform 0.11s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      box-shadow:
+        0 4px 0 rgba(0, 12, 15, 0.7),
+        0 7px 16px rgba(0, 8, 10, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    button:not(:disabled):hover {
+      filter: brightness(1.08);
+      box-shadow:
+        0 4px 0 rgba(0, 12, 15, 0.72),
+        0 8px 20px rgba(0, 8, 10, 0.28),
+        0 0 17px rgba(94, 234, 212, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    button:not(:disabled):active {
+      transform: translateY(3px) scale(0.992);
+      filter: brightness(1.14);
+      box-shadow:
+        0 1px 0 rgba(0, 12, 15, 0.75),
+        0 0 18px rgba(94, 234, 212, 0.28),
+        inset 0 2px 6px rgba(255, 255, 255, 0.12),
+        inset 0 -2px 7px rgba(0, 16, 18, 0.28);
+    }
+
+    button:disabled { box-shadow: none; }
+
+    .btn-light {
+      background: linear-gradient(180deg, #d6fffb, #91e7df);
+      color: #063238;
+    }
+
+    .btn-play {
+      background: linear-gradient(180deg, #75f5df, #35cdb9);
+      color: #043a38;
+      box-shadow:
+        0 4px 0 #137e75,
+        0 8px 20px rgba(0, 8, 10, 0.3),
+        0 0 16px rgba(94, 234, 212, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
+
+    .btn-stop, .btn-delete {
+      background: linear-gradient(180deg, #ffc1c8, #ee8996);
+      color: #551620;
+    }
+
+    .control,
+    .timer-display,
+    .session-item,
+    .playlist-item,
+    .wave-box {
+      border-color: rgba(94, 234, 212, 0.18);
+      background: rgba(3, 25, 30, 0.62);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+    }
+
+    input[type="range"] { accent-color: #5eead4; }
+    .help, .fade-note, .session-detail, .warning { color: #76a9ad; }
+    .chip { background: #16464c; color: #c8eeec; }
+    .status, .now-playing { color: #9cf8ea; }
+
+    .experimental-control {
+      border-color: #267b76;
+      background: rgba(45, 212, 191, 0.075);
+    }
+    .experimental-title { color: #c9fff7; }
+    .experimental-badge { background: #155e60; color: #bffcf4; }
+    .switch-track { border-color: #34747a; background: #123b41; }
+    .switch input:checked + .switch-track {
+      border-color: #78f5e3;
+      background: #1ea99a;
+      box-shadow: 0 0 15px rgba(94, 234, 212, 0.22);
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline-color: rgba(94, 234, 212, 0.72);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="header">
+      <div class="pill">〰 Personal Sound &amp; Focus Studio</div>
+      <h1>Frequency Point</h1>
+      <p class="subtitle">
+        Combines tone layers, binaural beat offset, harmonic patterning,
+        soft pulsing, modulation, and ambient texture into one comfortable personal listening session.
+      </p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <label for="goal">Session intention</label>
+        <div class="row">
+          <input id="goal" type="text" value="Gamma Complete Session" placeholder="Example: Lateral Thinking, Problem Solving, Creativity, Clear Brain Fog..." />
+          <button class="btn-light" id="proposeBtn">✨ Propose</button>
+        </div>
+
+        <div class="preset-menu">
+          <label id="presetMenuLabel">Preset Menu</label>
+          <button class="preset-toggle" id="presetMenuButton" type="button" aria-expanded="false" aria-labelledby="presetMenuLabel presetMenuButton">
+            Gamma Complete Session
+          </button>
+          <div class="preset-panel" id="presetMenuPanel">
+            <div>
+              <div class="preset-group-title">Brain Sessions</div>
+              <div class="preset-options">
+                <button class="preset-option" type="button" data-session-key="brain massage">Brain Massage</button>
+                <button class="preset-option" type="button" data-session-key="brainstorming">Brainstorming</button>
+                <button class="preset-option" type="button" data-session-key="lateral thinking">Lateral Thinking</button>
+                <button class="preset-option" type="button" data-session-key="problem solving">Problem Solving</button>
+                <button class="preset-option" type="button" data-session-key="creativity">Creativity</button>
+                <button class="preset-option" type="button" data-session-key="acuity senses">Acuity Senses</button>
+                <button class="preset-option" type="button" data-session-key="sharper senses and acuity thinking">Sharper Senses &amp; Acuity Thinking</button>
+                <button class="preset-option" type="button" data-session-key="clear brain fog">Clear Brain Fog</button>
+                <button class="preset-option" type="button" data-session-key="focus">Calm Focus</button>
+                <button class="preset-option" type="button" data-session-key="gamma complete session">Gamma Complete Session</button>
+              </div>
+            </div>
+            <div>
+              <div class="preset-group-title">General Sessions</div>
+              <div class="preset-options">
+                <button class="preset-option" type="button" data-session-key="integral complete health">Integral &amp; Complete Health</button>
+                <button class="preset-option" type="button" data-session-key="healthy vision">Healthy Vision Comfort</button>
+                <button class="preset-option" type="button" data-session-key="sleep">Deep Rest</button>
+                <button class="preset-option" type="button" data-session-key="stress">Stress Ease</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="control">
+            <div class="control-title">
+              <span>Potency, not volume</span>
+              <strong id="potencyMini">4/10</strong>
+            </div>
+            <input id="potency" type="range" min="1" max="10" value="4" />
+            <div class="value" id="potencyValue">4/10</div>
+            <div class="help">
+              Changes harmonic density, modulation depth, and perceived intensity while keeping output gentle.
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="control-title">
+              <span>Frequency volume</span>
+              <strong id="volumeMini">35%</strong>
+            </div>
+            <input id="volume" type="range" min="0" max="100" value="35" />
+            <div class="value" id="volumeValue">35%</div>
+            <div class="help">
+              Controls loudness only. Potency still controls depth and complexity.
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="control-title">
+              <span>Session time</span>
+              <strong id="minutesMini">12 min</strong>
+            </div>
+            <input id="minutes" type="range" min="3" max="45" value="12" />
+            <div class="value" id="minutesValue">12 minutes</div>
+            <div class="help" id="recommendedText">Recommended for this preset: 12 minutes.</div>
+          </div>
+        </div>
+
+        <div class="experimental-control">
+          <div class="experimental-copy">
+            <div class="experimental-title">
+              <span>40 Hz Focus Modulation</span>
+              <span class="experimental-badge">Experimental</span>
+            </div>
+            <div class="help">
+              Adds a very subtle 40 Hz amplitude-modulated tone. Evidence for cognitive benefit is limited and mixed; this is not a medical treatment.
+            </div>
+          </div>
+          <label class="switch" aria-label="Enable experimental 40 hertz focus modulation">
+            <input id="focus40Toggle" type="checkbox" role="switch" aria-describedby="focus40Status" />
+            <span class="switch-track" aria-hidden="true"></span>
+          </label>
+        </div>
+        <div class="help" id="focus40Status" aria-live="polite" style="margin: -17px 0 22px;">40 Hz modulation is off.</div>
+
+        <div class="row">
+          <button class="btn-play" id="startBtn">▶ Start Session</button>
+          <button class="btn-stop" id="stopBtn">■ Stop</button>
+        </div>
+
+        <div class="timer-display">
+          <div class="timer-label">Session timer</div>
+          <div class="timer-time" id="timerDisplay">00:00</div>
+          <div class="fade-note" id="fadeNote">Fade in: 4 sec · Fade out: 8 sec</div>
+          <div class="phase-note" id="phaseNote">Phase: ready</div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="playlist">
+          <div class="small-title">Playlist</div>
+          <div class="help">Build a queue. Sessions advance automatically after their fade-out.</div>
+          <div class="playlist-actions">
+            <button class="btn-light" id="addToPlaylistBtn" type="button">＋ Add Current</button>
+            <button class="btn-secondary" id="clearPlaylistBtn" type="button">Clear Queue</button>
+          </div>
+          <div class="now-playing" id="nowPlaying">Queue is ready.</div>
+          <div class="transport">
+            <button class="btn-secondary" id="previousBtn" type="button">⏮ Previous</button>
+            <button class="btn-secondary" id="playPlaylistBtn" type="button">▶ Play Queue</button>
+            <button class="btn-secondary" id="nextBtn" type="button">Next ⏭</button>
+          </div>
+          <div class="playlist-list" id="playlistList"></div>
+        </div>
+
+        <div class="library">
+          <button class="library-toggle" id="libraryToggle" type="button" aria-expanded="false">
+            Session Library
+          </button>
+          <div class="library-panel" id="libraryPanel">
+            <div class="library-header">
+              <div>
+                <div class="small-title">Saved sessions</div>
+                <div class="help">Saved in this browser only.</div>
+              </div>
+              <button class="btn-light" id="saveBtn">＋ Save Session</button>
+            </div>
+            <div class="library-list" id="libraryList"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="card side">
+        <div class="small-title">Proposed preset</div>
+        <h2 id="presetTitle">Healthy Vision Comfort</h2>
+
+        <div class="wave-box">
+          <div class="small-title">Composite wave</div>
+          <div class="wave-label" id="waveLabel"></div>
+        </div>
+
+        <div class="small-title">Included layers</div>
+        <div class="chips">
+          <span class="chip">Solfeggio tones</span>
+          <span class="chip">Binaural beat</span>
+          <span class="chip">Soft modulation</span>
+          <span class="chip">Harmonic pattern</span>
+          <span class="chip">Soft pulse layer</span>
+          <span class="chip">Ambient wave</span>
+          <span class="chip">Gamma 40–100 Hz sweep</span>
+        </div>
+
+        <p class="note" id="presetNote">
+          A gentle comfort preset. Not a medical treatment for eyesight.
+        </p>
+        <p class="note">
+          Tip: Type a different intention and press “Propose” to generate a different solfeggio set.
+        </p>
+
+        <div class="warning">
+          Personal listening tool only; not medical treatment or advice. Use low to moderate volume.
+          Stop if you feel discomfort, headache, dizziness, ear fatigue, anxiety, or unusual symptoms.
+          Avoid binaural sessions if you are sensitive to rhythmic audio or have seizure concerns unless cleared by a clinician.
+          Headphones are required for the binaural layer.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const GOAL_PRESETS = {
+      "gamma complete session": {
+        title: "Gamma Complete Session",
+        recommended: 16,
+        note: "A gentle wide-spectrum gamma session from 40–100 Hz, using phased modulation and comfortable carrier tones.",
+        carrier: [174, 285, 396, 432, 528, 639, 741, 852],
+        binaural: 40,
+        ambient: 0.22,
+        morphic: 0.12,
+        scalar: 0.10,
+        morphicBase: 140,
+        scalarCarrier: 174,
+        phaseMode: "gamma"
+      },
+      "gamma": {
+        title: "Gamma Complete Session",
+        recommended: 16,
+        note: "A gentle wide-spectrum gamma session from 40–100 Hz, using phased modulation and comfortable carrier tones.",
+        carrier: [174, 285, 396, 432, 528, 639, 741, 852],
+        binaural: 40,
+        ambient: 0.22,
+        morphic: 0.12,
+        scalar: 0.10,
+        morphicBase: 140,
+        scalarCarrier: 174,
+        phaseMode: "gamma"
+      },
+      "integral complete health": {
+        title: "Integral & Complete Health",
+        recommended: 18,
+        note: "A balanced full-body wellness session: grounding, calm focus, emotional balance, and gentle restoration.",
+        carrier: [174, 285, 396, 432, 528, 639, 741, 852],
+        binaural: 7.83,
+        ambient: 0.27,
+        morphic: 0.13,
+        scalar: 0.10,
+        morphicBase: 128,
+        scalarCarrier: 136.1
+      },
+      "complete health": {
+        title: "Integral & Complete Health",
+        recommended: 18,
+        note: "A balanced full-body wellness session: grounding, calm focus, emotional balance, and gentle restoration.",
+        carrier: [174, 285, 396, 432, 528, 639, 741, 852],
+        binaural: 7.83,
+        ambient: 0.27,
+        morphic: 0.13,
+        scalar: 0.10,
+        morphicBase: 128,
+        scalarCarrier: 136.1
+      },
+      "healthy vision": {
+        title: "Healthy Vision Comfort",
+        recommended: 12,
+        note: "A gentle comfort preset. Not a medical treatment for eyesight.",
+        carrier: [174, 285, 432, 528],
+        binaural: 7.83,
+        ambient: 0.28,
+        morphic: 0.12,
+        scalar: 0.09
+      },
+      sleep: {
+        title: "Deep Rest",
+        recommended: 20,
+        note: "Soft low-frequency binaural layer for relaxation before sleep.",
+        carrier: [174, 285, 432],
+        binaural: 3.5,
+        ambient: 0.34,
+        morphic: 0.09,
+        scalar: 0.06
+      },
+      focus: {
+        title: "Calm Focus",
+        recommended: 15,
+        note: "Balanced tone mix for quiet concentration.",
+        carrier: [417, 432, 528, 741],
+        binaural: 10,
+        ambient: 0.22,
+        morphic: 0.10,
+        scalar: 0.11
+      },
+      "lateral thinking": {
+        title: "Lateral Thinking",
+        recommended: 14,
+        note: "A flexible idea-shifting preset with an alpha/theta-style offset and lightly moving upper harmonics.",
+        carrier: [396, 417, 528, 639, 741],
+        binaural: 7.5,
+        ambient: 0.24,
+        morphic: 0.12,
+        scalar: 0.10,
+        morphicBase: 126,
+        scalarCarrier: 144
+      },
+      "problem solving": {
+        title: "Problem Solving",
+        recommended: 16,
+        note: "A steady clarity preset for structured thinking, using a low-beta style offset with calm carrier tones.",
+        carrier: [285, 396, 417, 528, 741],
+        binaural: 14,
+        ambient: 0.20,
+        morphic: 0.11,
+        scalar: 0.11,
+        morphicBase: 132,
+        scalarCarrier: 128
+      },
+      creativity: {
+        title: "Creativity",
+        recommended: 18,
+        note: "A spacious idea-flow preset with theta/alpha-style movement, warm carriers, and a slightly wider ambient bed.",
+        carrier: [396, 417, 432, 528, 639, 852],
+        binaural: 6.5,
+        ambient: 0.30,
+        morphic: 0.13,
+        scalar: 0.09,
+        morphicBase: 120,
+        scalarCarrier: 136.1
+      },
+      "acuity senses": {
+        title: "Acuity Senses",
+        recommended: 12,
+        note: "A bright alertness preset for sensory clarity, with crisp upper tones and a gentle beta-style offset.",
+        carrier: [417, 528, 639, 741, 852, 963],
+        binaural: 15,
+        ambient: 0.18,
+        morphic: 0.12,
+        scalar: 0.12,
+        morphicBase: 150,
+        scalarCarrier: 144
+      },
+      "sharper senses and acuity thinking": {
+        title: "Sharper Senses & Acuity Thinking",
+        recommended: 14,
+        note: "A crisp, balanced alertness session combining sensory detail with steady analytical focus. Keep the volume comfortable.",
+        carrier: [285, 417, 528, 639, 741, 852],
+        binaural: 14,
+        ambient: 0.18,
+        morphic: 0.11,
+        scalar: 0.10,
+        morphicBase: 144,
+        scalarCarrier: 136.1
+      },
+      "clear brain fog": {
+        title: "Clear Brain Fog",
+        recommended: 13,
+        note: "A gentle clearing preset that starts grounded and adds brighter carriers for a cleaner, more awake feel.",
+        carrier: [174, 285, 417, 528, 741],
+        binaural: 10,
+        ambient: 0.23,
+        morphic: 0.10,
+        scalar: 0.10,
+        morphicBase: 118,
+        scalarCarrier: 136.1
+      },
+      "brain massage": {
+        title: "Brain Massage",
+        recommended: 12,
+        note: "A soft mental reset preset for a relaxed, massaging headspace with slow alpha/theta-style movement.",
+        carrier: [174, 285, 396, 432, 528],
+        binaural: 7,
+        ambient: 0.32,
+        morphic: 0.09,
+        scalar: 0.08,
+        morphicBase: 108,
+        scalarCarrier: 111
+      },
+      brainstorming: {
+        title: "Brainstorming",
+        recommended: 18,
+        note: "A lively idea-generation preset for open association, playful connections, and more creative possibilities.",
+        carrier: [396, 417, 528, 639, 741, 852],
+        binaural: 6,
+        ambient: 0.26,
+        morphic: 0.14,
+        scalar: 0.10,
+        morphicBase: 124,
+        scalarCarrier: 144
+      },
+      stress: {
+        title: "Stress Ease",
+        recommended: 10,
+        note: "Gentle tones and slow modulation for a calmer listening session.",
+        carrier: [174, 396, 432, 528, 639],
+        binaural: 6,
+        ambient: 0.30,
+        morphic: 0.11,
+        scalar: 0.08
+      }
+    };
+
+    const SESSION_KEYS = [
+      "brain massage",
+      "brainstorming",
+      "lateral thinking",
+      "problem solving",
+      "creativity",
+      "acuity senses",
+      "sharper senses and acuity thinking",
+      "clear brain fog",
+      "focus",
+      "gamma complete session",
+      "integral complete health",
+      "healthy vision",
+      "sleep",
+      "stress"
+    ];
+
+    let preset = GOAL_PRESETS["gamma complete session"];
+    let audioCtx = null;
+    let timer = null;
+    let countdownInterval = null;
+    let sessionEndTime = null;
+    let masterGainNode = null;
+    let fadeGainNode = null;
+    let focus40GainNode = null;
+    let playlist = [];
+    let playlistIndex = -1;
+    let playlistMode = false;
+    let stopToken = 0;
+    const FADE_IN_SECONDS = 4;
+    const FADE_OUT_SECONDS = 8;
+
+    const goalInput = document.getElementById("goal");
+    const presetMenu = document.querySelector(".preset-menu");
+    const presetMenuButton = document.getElementById("presetMenuButton");
+    const presetOptionButtons = document.querySelectorAll(".preset-option");
+    const proposeBtn = document.getElementById("proposeBtn");
+    const potencySlider = document.getElementById("potency");
+    const volumeSlider = document.getElementById("volume");
+    const minutesSlider = document.getElementById("minutes");
+    const potencyValue = document.getElementById("potencyValue");
+    const potencyMini = document.getElementById("potencyMini");
+    const volumeValue = document.getElementById("volumeValue");
+    const volumeMini = document.getElementById("volumeMini");
+    const minutesValue = document.getElementById("minutesValue");
+    const minutesMini = document.getElementById("minutesMini");
+    const recommendedText = document.getElementById("recommendedText");
+    const presetTitle = document.getElementById("presetTitle");
+    const presetNote = document.getElementById("presetNote");
+    const waveLabel = document.getElementById("waveLabel");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const library = document.querySelector(".library");
+    const libraryToggle = document.getElementById("libraryToggle");
+    const libraryList = document.getElementById("libraryList");
+    const statusEl = document.getElementById("status");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const fadeNote = document.getElementById("fadeNote");
+    const phaseNote = document.getElementById("phaseNote");
+    const addToPlaylistBtn = document.getElementById("addToPlaylistBtn");
+    const clearPlaylistBtn = document.getElementById("clearPlaylistBtn");
+    const playPlaylistBtn = document.getElementById("playPlaylistBtn");
+    const previousBtn = document.getElementById("previousBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const playlistList = document.getElementById("playlistList");
+    const nowPlaying = document.getElementById("nowPlaying");
+    const focus40Toggle = document.getElementById("focus40Toggle");
+    const focus40Status = document.getElementById("focus40Status");
+
+
+    function stringSeed(text) {
+      let seed = 0;
+      for (let i = 0; i < text.length; i++) {
+        seed = (seed * 31 + text.charCodeAt(i)) % 100000;
+      }
+      return seed;
+    }
+
+    function pickUniqueFrequencies(seed, count) {
+      const solfeggio = [174, 285, 396, 417, 432, 528, 639, 741, 852, 963];
+      const chosen = [];
+      let index = seed % solfeggio.length;
+
+      while (chosen.length < count) {
+        const f = solfeggio[index % solfeggio.length];
+        if (!chosen.includes(f)) chosen.push(f);
+        index += 2 + (seed % 3);
+      }
+
+      return chosen.sort((a, b) => a - b);
+    }
+
+    function makeCustomPreset(goal) {
+      const seed = stringSeed(goal.toLowerCase());
+      const carriers = pickUniqueFrequencies(seed, 4 + (seed % 2));
+      const binauralChoices = [4, 6, 7.83, 8, 10, 12];
+      const binaural = binauralChoices[seed % binauralChoices.length];
+
+      return {
+        title: goal || "Custom Wellness Session",
+        recommended: 10 + (seed % 16),
+        note: "Custom generated mix using a unique solfeggio selection based on your intention text.",
+        carrier: carriers,
+        binaural: binaural,
+        ambient: 0.20 + ((seed % 12) / 100),
+        morphic: 0.08 + ((seed % 7) / 100),
+        scalar: 0.06 + ((seed % 8) / 100),
+        morphicBase: 96 + (seed % 64),
+        scalarCarrier: 111 + (seed % 45)
+      };
+    }
+
+    function getBrainSessionKeyByTitle(title) {
+      return SESSION_KEYS.find(key => GOAL_PRESETS[key].title === title) || "";
+    }
+
+    function setPresetMenuOpen(isOpen) {
+      presetMenu.classList.toggle("open", isOpen);
+      presetMenuButton.setAttribute("aria-expanded", String(isOpen));
+    }
+
+    function syncPresetMenu() {
+      const activeKey = getBrainSessionKeyByTitle(preset.title);
+      presetMenuButton.textContent = activeKey ? preset.title : "Choose a preset...";
+
+      presetOptionButtons.forEach(button => {
+        button.classList.toggle("active", button.dataset.sessionKey === activeKey);
+      });
+    }
+
+    function applyPresetKey(key) {
+      if (!key || !GOAL_PRESETS[key]) return;
+
+      preset = GOAL_PRESETS[key];
+      goalInput.value = preset.title;
+      minutesSlider.value = preset.recommended;
+      updateUI();
+      if (!audioCtx) updateTimerDisplay(Number(minutesSlider.value) * 60);
+      statusEl.textContent = audioCtx
+        ? "Preset ready: " + preset.title + ". Stop and start again to hear this preset."
+        : "Preset ready: " + preset.title;
+      setPresetMenuOpen(false);
+    }
+
+    function getPreset(goal) {
+      const clean = goal.trim().toLowerCase();
+
+      if (!clean) return GOAL_PRESETS.stress;
+      if (GOAL_PRESETS[clean]) return GOAL_PRESETS[clean];
+
+      if (
+        clean.includes("gamma") ||
+        clean.includes("40") ||
+        clean.includes("100") ||
+        clean.includes("wide spectrum")
+      ) {
+        return GOAL_PRESETS["gamma complete session"];
+      }
+
+      if (
+        clean.includes("integral") ||
+        clean.includes("complete health") ||
+        clean.includes("full health") ||
+        clean.includes("mental and physical") ||
+        clean.includes("mental physical") ||
+        clean.includes("salud integral")
+      ) {
+        return GOAL_PRESETS["integral complete health"];
+      }
+
+      if (
+        clean.includes("lateral") ||
+        clean.includes("outside the box") ||
+        clean.includes("different angle") ||
+        clean.includes("new perspective")
+      ) {
+        return GOAL_PRESETS["lateral thinking"];
+      }
+
+      if (
+        clean.includes("problem") ||
+        clean.includes("solve") ||
+        clean.includes("solution") ||
+        clean.includes("decision") ||
+        clean.includes("logic")
+      ) {
+        return GOAL_PRESETS["problem solving"];
+      }
+
+      if (
+        clean.includes("brainstorm") ||
+        clean.includes("best ideas") ||
+        clean.includes("creative ideas") ||
+        clean.includes("most creative ideas") ||
+        clean.includes("idea generation") ||
+        clean.includes("generate ideas")
+      ) {
+        return GOAL_PRESETS.brainstorming;
+      }
+
+      if (
+        clean.includes("creative") ||
+        clean.includes("creativity") ||
+        clean.includes("imagination") ||
+        clean.includes("inspiration") ||
+        clean.includes("idea")
+      ) {
+        return GOAL_PRESETS.creativity;
+      }
+
+      if (
+        clean.includes("sharper senses") ||
+        clean.includes("acuity thinking") ||
+        clean.includes("sharp thinking")
+      ) {
+        return GOAL_PRESETS["sharper senses and acuity thinking"];
+      }
+
+      if (
+        clean.includes("acuity") ||
+        clean.includes("senses") ||
+        clean.includes("sensory") ||
+        clean.includes("alert") ||
+        clean.includes("sharp")
+      ) {
+        return GOAL_PRESETS["acuity senses"];
+      }
+
+      if (
+        clean.includes("brain massage") ||
+        clean.includes("mental reset") ||
+        clean.includes("mind refresh") ||
+        clean.includes("head relaxation") ||
+        clean.includes("relax my head") ||
+        clean.includes("head massage")
+      ) {
+        return GOAL_PRESETS["brain massage"];
+      }
+
+      if (
+        clean.includes("brain fog") ||
+        clean.includes("foggy") ||
+        clean.includes("clear head") ||
+        clean.includes("mental clarity") ||
+        clean.includes("clear brain") ||
+        clean.includes("clarity")
+      ) {
+        return GOAL_PRESETS["clear brain fog"];
+      }
+
+      if (clean.includes("vision") || clean.includes("eye") || clean.includes("vista")) {
+        return {
+          title: "Healthy Vision Comfort",
+          recommended: 12,
+          note: "A bright but gentle mix using upper solfeggio tones and soft pulse texture.",
+          carrier: [285, 528, 741, 852],
+          binaural: 8.0,
+          ambient: 0.22,
+          morphic: 0.13,
+          scalar: 0.10,
+          morphicBase: 144,
+          scalarCarrier: 136.1
+        };
+      }
+      if (clean.includes("sleep") || clean.includes("dream") || clean.includes("dormir")) {
+        return {
+          title: "Deep Rest",
+          recommended: 20,
+          note: "Lower, slower tones with a delta-style binaural offset.",
+          carrier: [174, 285, 396, 432],
+          binaural: 3.5,
+          ambient: 0.34,
+          morphic: 0.08,
+          scalar: 0.06,
+          morphicBase: 96,
+          scalarCarrier: 111
+        };
+      }
+      if (clean.includes("focus") || clean.includes("study") || clean.includes("concentration")) {
+        return {
+          title: "Calm Focus",
+          recommended: 15,
+          note: "Clearer upper-mid tone set with a soft alpha-style binaural offset.",
+          carrier: [417, 528, 639, 741],
+          binaural: 10,
+          ambient: 0.20,
+          morphic: 0.11,
+          scalar: 0.12,
+          morphicBase: 128,
+          scalarCarrier: 144
+        };
+      }
+      if (clean.includes("stress") || clean.includes("anxiety") || clean.includes("calm")) {
+        return {
+          title: "Stress Ease",
+          recommended: 10,
+          note: "Grounding solfeggio set with slow, comfortable movement.",
+          carrier: [174, 396, 432, 528, 639],
+          binaural: 6,
+          ambient: 0.30,
+          morphic: 0.10,
+          scalar: 0.08,
+          morphicBase: 108,
+          scalarCarrier: 128
+        };
+      }
+
+      return makeCustomPreset(goal);
+    }
+
+    function updateUI() {
+      const potency = Number(potencySlider.value);
+      const volume = Number(volumeSlider.value);
+      const minutes = Number(minutesSlider.value);
+
+      potencyValue.textContent = potency + "/10";
+      potencyMini.textContent = potency + "/10";
+      volumeValue.textContent = volume + "%";
+      volumeMini.textContent = volume + "%";
+      minutesValue.textContent = minutes + (minutes === 1 ? " minute" : " minutes");
+      minutesMini.textContent = minutes + " min";
+
+      presetTitle.textContent = preset.title;
+      presetNote.textContent = preset.note;
+      syncPresetMenu();
+      recommendedText.textContent = "Recommended for this preset: " + preset.recommended + " minutes.";
+
+      waveLabel.textContent =
+        "Solfeggio: " +
+        preset.carrier.join(" Hz + ") +
+        " Hz | binaural " +
+        preset.binaural +
+        " Hz | harmonic base " +
+        Math.round(preset.morphicBase || 111) +
+        " Hz | pulse carrier " +
+        Math.round(preset.scalarCarrier || 136.1) +
+        " Hz | harmonic " +
+        Math.round((preset.morphic || 0.1) * 100) +
+        "% | pulse " +
+        Math.round((preset.scalar || 0.08) * 100) +
+        "% | potency " +
+        potency +
+        "/10 | volume " +
+        volume +
+        "%";
+    }
+
+    function updateFocus40State(announce = true) {
+      const enabled = focus40Toggle.checked;
+      focus40Status.textContent = enabled
+        ? "40 Hz modulation is on at a subtle level."
+        : "40 Hz modulation is off.";
+
+      if (focus40GainNode && audioCtx) {
+        focus40GainNode.gain.setTargetAtTime(enabled ? 1 : 0, audioCtx.currentTime, 0.06);
+      }
+
+      if (announce) {
+        statusEl.textContent = enabled
+          ? "Experimental 40 Hz focus modulation enabled."
+          : "Experimental 40 Hz focus modulation disabled.";
+      }
+    }
+
+
+    function formatTime(totalSeconds) {
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+    }
+
+    function updateTimerDisplay(seconds) {
+      timerDisplay.textContent = formatTime(Math.max(0, seconds));
+    }
+
+    function clearCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+
+    function startCountdown(totalSeconds) {
+      clearCountdown();
+      sessionEndTime = Date.now() + totalSeconds * 1000;
+      updateTimerDisplay(totalSeconds);
+
+      countdownInterval = setInterval(() => {
+        const remaining = Math.max(0, Math.ceil((sessionEndTime - Date.now()) / 1000));
+        updateTimerDisplay(remaining);
+
+        if (preset.phaseMode === "gamma" && audioCtx) {
+          const elapsed = Math.max(0, totalSeconds - remaining);
+          const section = elapsed / totalSeconds;
+          if (section < 0.20) {
+            phaseNote.textContent = "Gamma phase 1: 40–48 Hz low gamma opening";
+          } else if (section < 0.40) {
+            phaseNote.textContent = "Gamma phase 2: 50–60 Hz clarity";
+          } else if (section < 0.60) {
+            phaseNote.textContent = "Gamma phase 3: 65–75 Hz expansion";
+          } else if (section < 0.80) {
+            phaseNote.textContent = "Gamma phase 4: 80–100 Hz integration";
+          } else {
+            phaseNote.textContent = "Gamma phase 5: full 40–100 Hz blend";
+          }
+        }
+
+        if (remaining <= FADE_OUT_SECONDS && remaining > 0) {
+          statusEl.textContent = "Fading out... session ending soon.";
+        }
+
+        if (remaining <= 0) {
+          clearCountdown();
+        }
+      }, 250);
+    }
+
+    function fadeOutAndStop(reasonText, advancePlaylist = false) {
+      if (!audioCtx || !fadeGainNode) {
+        stopAudio(true, advancePlaylist);
+        return;
+      }
+
+      const thisStopToken = ++stopToken;
+      const ctx = audioCtx;
+      const now = ctx.currentTime;
+
+      try {
+        fadeGainNode.gain.cancelScheduledValues(now);
+        fadeGainNode.gain.setValueAtTime(fadeGainNode.gain.value, now);
+        fadeGainNode.gain.linearRampToValueAtTime(0, now + FADE_OUT_SECONDS);
+      } catch (e) {}
+
+      statusEl.textContent = reasonText || "Fading out...";
+      clearCountdown();
+
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (thisStopToken === stopToken) stopAudio(true, advancePlaylist);
+      }, FADE_OUT_SECONDS * 1000 + 250);
+    }
+
+    function stopAudio(skipFade, advancePlaylist = false) {
+      if (!skipFade && audioCtx) {
+        playlistMode = false;
+        fadeOutAndStop("Manual stop: fading out...");
+        return;
+      }
+
+      stopToken++;
+      if (timer) clearTimeout(timer);
+      timer = null;
+      clearCountdown();
+
+      if (audioCtx) {
+        try { audioCtx.close(); } catch (e) {}
+      }
+
+      audioCtx = null;
+      masterGainNode = null;
+      fadeGainNode = null;
+      focus40GainNode = null;
+      sessionEndTime = null;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      updateTimerDisplay(Number(minutesSlider.value) * 60);
+
+      if (advancePlaylist && playlistMode) {
+        if (playlistIndex + 1 < playlist.length) {
+          playlistIndex++;
+          loadPlaylistItem(playlistIndex, true);
+        } else {
+          playlistMode = false;
+          nowPlaying.textContent = "Playlist complete.";
+          statusEl.textContent = "Playlist complete.";
+          renderPlaylist();
+        }
+      } else if (!playlistMode) {
+        nowPlaying.textContent = playlist.length ? "Queue paused." : "Queue is ready.";
+      }
+    }
+
+
+    function createGammaCompleteLayer(ctx, fade, totalSeconds, potency) {
+      if (preset.phaseMode !== "gamma") return;
+
+      const now = ctx.currentTime;
+      const gammaBus = ctx.createGain();
+      gammaBus.gain.value = 0.012 + potency * 0.0015;
+      gammaBus.connect(fade);
+
+      const phases = [
+        { name: "40–48 Hz low gamma opening", start: 0.00, end: 0.20, gamma: [40, 44, 48], carriers: [174, 285, 432] },
+        { name: "50–60 Hz mid gamma clarity", start: 0.20, end: 0.40, gamma: [50, 55, 60], carriers: [285, 396, 528] },
+        { name: "65–75 Hz high gamma expansion", start: 0.40, end: 0.60, gamma: [65, 70, 75], carriers: [396, 528, 639] },
+        { name: "80–100 Hz upper gamma integration", start: 0.60, end: 0.80, gamma: [80, 90, 100], carriers: [432, 639, 741] },
+        { name: "Full 40–100 Hz blend", start: 0.80, end: 1.00, gamma: [40, 60, 80, 100], carriers: [432, 528, 741, 852] }
+      ];
+
+      phases.forEach((phase) => {
+        const startTime = now + totalSeconds * phase.start;
+        const endTime = now + totalSeconds * phase.end;
+
+        const phaseGain = ctx.createGain();
+        phaseGain.gain.setValueAtTime(0, now);
+        phaseGain.gain.setValueAtTime(0, startTime);
+        phaseGain.gain.linearRampToValueAtTime(1, startTime + 3);
+        phaseGain.gain.setValueAtTime(1, Math.max(startTime + 3, endTime - 3));
+        phaseGain.gain.linearRampToValueAtTime(0, endTime);
+        phaseGain.connect(gammaBus);
+
+        phase.carriers.forEach((carrier, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const mod = ctx.createOscillator();
+          const modGain = ctx.createGain();
+
+          osc.type = i % 2 === 0 ? "sine" : "triangle";
+          osc.frequency.value = carrier;
+          mod.frequency.value = phase.gamma[i % phase.gamma.length];
+
+          modGain.gain.value = 0.006 + potency * 0.0008;
+          gain.gain.value = 0.010 / phase.carriers.length;
+
+          mod.connect(modGain).connect(gain.gain);
+          osc.connect(gain).connect(phaseGain);
+
+          osc.start(startTime);
+          mod.start(startTime);
+          osc.stop(endTime + 0.25);
+          mod.stop(endTime + 0.25);
+        });
+
+        const merger = ctx.createChannelMerger(2);
+        const left = ctx.createOscillator();
+        const right = ctx.createOscillator();
+        const lGain = ctx.createGain();
+        const rGain = ctx.createGain();
+        const gammaBeat = phase.gamma[Math.floor(phase.gamma.length / 2)];
+
+        left.frequency.value = 220;
+        right.frequency.value = 220 + gammaBeat;
+        lGain.gain.value = 0.006;
+        rGain.gain.value = 0.006;
+
+        left.connect(lGain).connect(merger, 0, 0);
+        right.connect(rGain).connect(merger, 0, 1);
+        merger.connect(phaseGain);
+
+        left.start(startTime);
+        right.start(startTime);
+        left.stop(endTime + 0.25);
+        right.stop(endTime + 0.25);
+      });
+    }
+
+    function startAudio() {
+      stopAudio(true);
+
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) {
+        alert("Your browser does not support Web Audio.");
+        return;
+      }
+
+      const potency = Number(potencySlider.value);
+      const volume = Number(volumeSlider.value);
+      const minutes = Number(minutesSlider.value);
+      const totalSeconds = minutes * 60;
+
+      audioCtx = new AudioContext();
+      const ctx = audioCtx;
+      if (ctx.state === "suspended") ctx.resume();
+      const now = ctx.currentTime;
+
+      const master = ctx.createGain();
+      const compressor = ctx.createDynamicsCompressor();
+
+      masterGainNode = master;
+      const safeVolume = Math.max(0, Math.min(100, volume)) / 100;
+      master.gain.value = (0.035 + potency * 0.006) * safeVolume;
+      compressor.threshold.value = -28;
+      compressor.knee.value = 24;
+      compressor.ratio.value = 8;
+      compressor.attack.value = 0.015;
+      compressor.release.value = 0.25;
+
+      master.connect(compressor).connect(ctx.destination);
+
+      const fade = ctx.createGain();
+      const modulationBus = ctx.createGain();
+      fadeGainNode = fade;
+      fade.gain.setValueAtTime(0, now);
+      fade.gain.linearRampToValueAtTime(1, now + FADE_IN_SECONDS);
+      modulationBus.gain.value = 0.82;
+      fade.connect(modulationBus).connect(master);
+
+      // Solfeggio / carrier tone layer.
+      preset.carrier.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = i % 2 === 0 ? "sine" : "triangle";
+        osc.frequency.value = freq;
+        gain.gain.value = 0.055 / preset.carrier.length;
+
+        osc.connect(gain).connect(fade);
+        osc.start();
+      });
+
+      // Binaural beat layer: stereo headphones recommended.
+      const base = 220;
+      const merger = ctx.createChannelMerger(2);
+      const left = ctx.createOscillator();
+      const right = ctx.createOscillator();
+      const lGain = ctx.createGain();
+      const rGain = ctx.createGain();
+
+      left.frequency.value = base;
+      right.frequency.value = base + preset.binaural;
+      lGain.gain.value = 0.035;
+      rGain.gain.value = 0.035;
+
+      left.connect(lGain).connect(merger, 0, 0);
+      right.connect(rGain).connect(merger, 0, 1);
+      merger.connect(fade);
+
+      left.start();
+      right.start();
+
+      // Slow modulation on its own gain stage. This keeps 0% master volume truly silent.
+      const lfo = ctx.createOscillator();
+      const lfoGain = ctx.createGain();
+
+      lfo.frequency.value = 0.08 + potency * 0.025;
+      lfoGain.gain.value = 0.16;
+
+      lfo.connect(lfoGain).connect(modulationBus.gain);
+      lfo.start();
+
+      // Optional experimental 40 Hz amplitude modulation. The carrier remains
+      // subtle, and this bus can be switched smoothly while a session is playing.
+      const focus40Bus = ctx.createGain();
+      const focus40Carrier = ctx.createOscillator();
+      const focus40CarrierGain = ctx.createGain();
+      const focus40TremoloGain = ctx.createGain();
+      const focus40Modulator = ctx.createOscillator();
+      const focus40Depth = ctx.createGain();
+
+      focus40GainNode = focus40Bus;
+      focus40Bus.gain.value = focus40Toggle.checked ? 1 : 0;
+      focus40Carrier.type = "sine";
+      focus40Carrier.frequency.value = 320;
+      focus40CarrierGain.gain.value = 0.006;
+      focus40TremoloGain.gain.value = 0.5;
+      focus40Modulator.type = "sine";
+      focus40Modulator.frequency.value = 40;
+      focus40Depth.gain.value = 0.32;
+
+      focus40Modulator.connect(focus40Depth).connect(focus40TremoloGain.gain);
+      focus40Carrier.connect(focus40CarrierGain).connect(focus40TremoloGain).connect(focus40Bus).connect(fade);
+      focus40Carrier.start();
+      focus40Modulator.start();
+
+      // Morphic Field Pattern layer:
+      // Soft harmonic patterning using clustered sine waves.
+      const morphicBus = ctx.createGain();
+      morphicBus.gain.value = (preset.morphic || 0.1) * (0.025 + potency * 0.002);
+      morphicBus.connect(fade);
+
+      const morphicPattern = [1, 1.125, 1.25, 1.5, 2];
+
+      morphicPattern.forEach((ratio, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.value = (preset.morphicBase || 111) * ratio + i * 0.7;
+        gain.gain.value = 0.018;
+
+        osc.connect(gain).connect(morphicBus);
+        osc.start(now + i * 0.08);
+      });
+
+      // Scalar Wave Pulse layer:
+      // Ultra-gentle pulsing carrier created with low-frequency gain shaping.
+      const scalarCarrier = ctx.createOscillator();
+      const scalarGain = ctx.createGain();
+      const scalarPulse = ctx.createOscillator();
+      const scalarPulseGain = ctx.createGain();
+
+      scalarCarrier.type = "sine";
+      scalarCarrier.frequency.value = preset.scalarCarrier || 136.1;
+
+      scalarGain.gain.value = (preset.scalar || 0.08) * (0.018 + potency * 0.0015);
+
+      scalarPulse.frequency.value = 0.5 + potency * 0.07;
+      scalarPulseGain.gain.value = 0.012;
+
+      scalarPulse.connect(scalarPulseGain).connect(scalarGain.gain);
+      scalarCarrier.connect(scalarGain).connect(fade);
+
+      scalarCarrier.start();
+      scalarPulse.start();
+
+      // Very soft filtered noise bed.
+      const bufferSize = ctx.sampleRate * 2;
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.18;
+      }
+
+      const noise = ctx.createBufferSource();
+      const filter = ctx.createBiquadFilter();
+      const noiseGain = ctx.createGain();
+
+      noise.buffer = noiseBuffer;
+      noise.loop = true;
+      filter.type = "lowpass";
+      filter.frequency.value = 900;
+      noiseGain.gain.value = preset.ambient * 0.035;
+
+      noise.connect(filter).connect(noiseGain).connect(fade);
+      noise.start();
+
+      createGammaCompleteLayer(ctx, fade, totalSeconds, potency);
+
+      const fadeOutStartMs = Math.max(0, (totalSeconds - FADE_OUT_SECONDS) * 1000);
+
+      fadeNote.textContent = "Fade in: " + FADE_IN_SECONDS + " sec · Fade out: " + FADE_OUT_SECONDS + " sec";
+      startCountdown(totalSeconds);
+
+      if (phaseNote) {
+        phaseNote.textContent = preset.phaseMode === "gamma"
+          ? "Gamma phase 1: 40–48 Hz low gamma opening"
+          : "Phase: continuous blend";
+      }
+      statusEl.textContent = "Playing: " + preset.title + " — session will fade out and stop automatically.";
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      timer = setTimeout(() => {
+        fadeOutAndStop("Time complete: fading out...", true);
+      }, fadeOutStartMs);
+    }
+
+
+    function getSavedSessions() {
+      try {
+        return JSON.parse(localStorage.getItem("frequencyWellnessSessions") || "[]");
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setSavedSessions(sessions) {
+      try {
+        localStorage.setItem("frequencyWellnessSessions", JSON.stringify(sessions));
+      } catch (e) {
+        statusEl.textContent = "This browser could not save the session.";
+      }
+    }
+
+    function getPlaylist() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("frequencyWellnessPlaylist") || "[]");
+        return Array.isArray(saved) ? saved : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function savePlaylist() {
+      try {
+        localStorage.setItem("frequencyWellnessPlaylist", JSON.stringify(playlist));
+      } catch (e) {
+        statusEl.textContent = "This browser could not save the playlist.";
+      }
+    }
+
+    function addCurrentToPlaylist() {
+      playlist.push({
+        id: Date.now() + Math.random(),
+        title: preset.title,
+        goal: goalInput.value || preset.title,
+        preset: JSON.parse(JSON.stringify(preset)),
+        potency: Number(potencySlider.value),
+        volume: Number(volumeSlider.value),
+        minutes: Number(minutesSlider.value),
+        focus40Enabled: focus40Toggle.checked
+      });
+      savePlaylist();
+      renderPlaylist();
+      statusEl.textContent = preset.title + " added to the playlist.";
+    }
+
+    function loadPlaylistItem(index, startImmediately = false) {
+      const item = playlist[index];
+      if (!item) return;
+
+      playlistIndex = index;
+      preset = item.preset;
+      goalInput.value = item.goal;
+      potencySlider.value = item.potency;
+      volumeSlider.value = item.volume;
+      minutesSlider.value = item.minutes;
+      focus40Toggle.checked = Boolean(item.focus40Enabled);
+      updateFocus40State(false);
+      updateUI();
+      updateTimerDisplay(item.minutes * 60);
+      nowPlaying.textContent = (startImmediately ? "Now playing: " : "Selected: ") + item.title;
+      renderPlaylist();
+      if (startImmediately) startAudio();
+    }
+
+    function playPlaylist() {
+      if (!playlist.length) {
+        statusEl.textContent = "Add at least one session to the playlist first.";
+        return;
+      }
+      playlistMode = true;
+      if (playlistIndex < 0 || playlistIndex >= playlist.length) playlistIndex = 0;
+      loadPlaylistItem(playlistIndex, true);
+    }
+
+    function movePlaylist(direction) {
+      if (!playlist.length) return;
+      const nextIndex = Math.min(playlist.length - 1, Math.max(0, playlistIndex + direction));
+      playlistMode = true;
+      stopAudio(true);
+      loadPlaylistItem(nextIndex, true);
+    }
+
+    function removePlaylistItem(id) {
+      const removedIndex = playlist.findIndex(item => item.id === id);
+      if (removedIndex < 0) return;
+      playlist.splice(removedIndex, 1);
+      if (removedIndex < playlistIndex) playlistIndex--;
+      if (playlistIndex >= playlist.length) playlistIndex = playlist.length - 1;
+      if (!playlist.length) playlistMode = false;
+      savePlaylist();
+      renderPlaylist();
+    }
+
+    function clearPlaylist() {
+      playlistMode = false;
+      stopAudio(true);
+      playlist = [];
+      playlistIndex = -1;
+      savePlaylist();
+      renderPlaylist();
+      nowPlaying.textContent = "Queue is ready.";
+      statusEl.textContent = "Playlist cleared.";
+    }
+
+    function renderPlaylist() {
+      playlistList.innerHTML = "";
+      previousBtn.disabled = !playlist.length || playlistIndex <= 0;
+      nextBtn.disabled = !playlist.length || playlistIndex >= playlist.length - 1;
+      playPlaylistBtn.disabled = !playlist.length;
+      clearPlaylistBtn.disabled = !playlist.length;
+
+      if (!playlist.length) {
+        const empty = document.createElement("div");
+        empty.className = "help";
+        empty.textContent = "No queued sessions yet.";
+        playlistList.appendChild(empty);
+        return;
+      }
+
+      playlist.forEach((item, index) => {
+        const row = document.createElement("div");
+        row.className = "playlist-item" + (index === playlistIndex ? " active" : "");
+
+        const number = document.createElement("span");
+        number.className = "playlist-number";
+        number.textContent = String(index + 1).padStart(2, "0");
+
+        const info = document.createElement("button");
+        info.className = "btn-small";
+        info.style.textAlign = "left";
+        info.textContent = item.title + " · " + item.minutes + " min";
+        if (item.focus40Enabled) info.textContent += " · 40 Hz on";
+        info.setAttribute("aria-label", "Select " + item.title);
+        info.onclick = () => {
+          playlistMode = false;
+          stopAudio(true);
+          loadPlaylistItem(index, false);
+        };
+
+        const remove = document.createElement("button");
+        remove.className = "btn-small btn-delete";
+        remove.textContent = "Remove";
+        remove.setAttribute("aria-label", "Remove " + item.title + " from playlist");
+        remove.onclick = () => removePlaylistItem(item.id);
+
+        row.append(number, info, remove);
+        playlistList.appendChild(row);
+      });
+    }
+
+    function setLibraryOpen(isOpen) {
+      library.classList.toggle("open", isOpen);
+      libraryToggle.setAttribute("aria-expanded", String(isOpen));
+    }
+
+    function updateLibraryToggle(count) {
+      const label = count === 1 ? "1 saved session" : count + " saved sessions";
+      libraryToggle.textContent = "Session Library · " + label;
+    }
+
+    function saveCurrentSession() {
+      const potency = Number(potencySlider.value);
+      const minutes = Number(minutesSlider.value);
+      const sessions = getSavedSessions();
+
+      const session = {
+        id: Date.now(),
+        goal: goalInput.value || preset.title,
+        title: preset.title,
+        preset: preset,
+        potency: potency,
+        volume: Number(volumeSlider.value),
+        minutes: minutes,
+        focus40Enabled: focus40Toggle.checked,
+        savedAt: new Date().toLocaleString()
+      };
+
+      sessions.unshift(session);
+      setSavedSessions(sessions);
+      renderLibrary();
+      setLibraryOpen(true);
+      statusEl.textContent = "Session saved to library.";
+    }
+
+    function loadSession(id) {
+      const sessions = getSavedSessions();
+      const session = sessions.find(s => s.id === id);
+      if (!session) return;
+
+      preset = session.preset;
+      goalInput.value = session.goal;
+      potencySlider.value = session.potency;
+      volumeSlider.value = session.volume ?? 35;
+      minutesSlider.value = session.minutes;
+      focus40Toggle.checked = Boolean(session.focus40Enabled);
+      updateFocus40State(false);
+      updateUI();
+      if (!audioCtx) updateTimerDisplay(Number(minutesSlider.value) * 60);
+      statusEl.textContent = audioCtx
+        ? "Loaded session: " + session.title + ". Stop and start again to hear this preset."
+        : "Loaded session: " + session.title;
+    }
+
+    function deleteSession(id) {
+      const sessions = getSavedSessions().filter(s => s.id !== id);
+      setSavedSessions(sessions);
+      renderLibrary();
+      statusEl.textContent = "Session deleted.";
+    }
+
+    function renderLibrary() {
+      const sessions = getSavedSessions();
+      libraryList.innerHTML = "";
+      updateLibraryToggle(sessions.length);
+
+      if (!sessions.length) {
+        const empty = document.createElement("div");
+        empty.className = "help";
+        empty.textContent = "No saved sessions yet. Press “Save Session” to keep the current mix.";
+        libraryList.appendChild(empty);
+        return;
+      }
+
+      sessions.forEach(session => {
+        const item = document.createElement("div");
+        item.className = "session-item";
+
+        const info = document.createElement("div");
+        const name = document.createElement("div");
+        const detail = document.createElement("div");
+
+        name.className = "session-name";
+        detail.className = "session-detail";
+
+        name.textContent = session.title;
+        detail.textContent =
+          session.minutes + " min · potency " +
+          session.potency + "/10 · volume " +
+          (session.volume ?? 35) + "% · " +
+          session.preset.carrier.join(", ") +
+          " Hz" +
+          (session.focus40Enabled ? " · 40 Hz focus on" : "");
+
+        info.appendChild(name);
+        info.appendChild(detail);
+
+        const loadBtn = document.createElement("button");
+        loadBtn.className = "btn-small";
+        loadBtn.textContent = "Load";
+        loadBtn.onclick = () => loadSession(session.id);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-small btn-delete";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = () => deleteSession(session.id);
+
+        item.appendChild(info);
+        item.appendChild(loadBtn);
+        item.appendChild(deleteBtn);
+
+        libraryList.appendChild(item);
+      });
+    }
+
+    function ensureIntegralSession() {
+      const sessions = getSavedSessions();
+      const starterSessions = [
+        { goal: "Gamma Complete Session", key: "gamma complete session", potency: 4 },
+        { goal: "Integral complete health", key: "integral complete health", potency: 5 },
+        { goal: "Brain Massage", key: "brain massage", potency: 3 },
+        { goal: "Brainstorming", key: "brainstorming", potency: 4 },
+        { goal: "Lateral Thinking", key: "lateral thinking", potency: 4 },
+        { goal: "Problem Solving", key: "problem solving", potency: 5 },
+        { goal: "Creativity", key: "creativity", potency: 4 },
+        { goal: "Acuity Senses", key: "acuity senses", potency: 4 },
+        { goal: "Sharper Senses & Acuity Thinking", key: "sharper senses and acuity thinking", potency: 4 },
+        { goal: "Clear Brain Fog", key: "clear brain fog", potency: 4 }
+      ];
+
+      let changed = false;
+
+      starterSessions.forEach((starter, index) => {
+        const starterPreset = GOAL_PRESETS[starter.key];
+        const exists = sessions.some(s => s.title === starterPreset.title);
+
+        if (!exists) {
+          sessions.unshift({
+            id: Date.now() + index,
+            goal: starter.goal,
+            title: starterPreset.title,
+            preset: starterPreset,
+            potency: starter.potency,
+            volume: 35,
+            minutes: starterPreset.recommended,
+            savedAt: new Date().toLocaleString()
+          });
+          changed = true;
+        }
+      });
+
+      if (changed) setSavedSessions(sessions);
+    }
+
+    proposeBtn.addEventListener("click", () => {
+      preset = getPreset(goalInput.value);
+      minutesSlider.value = preset.recommended;
+      updateUI();
+      if (!audioCtx) updateTimerDisplay(Number(minutesSlider.value) * 60);
+      if (audioCtx) {
+        statusEl.textContent = "Preset ready: " + preset.title + ". Stop and start again to hear this preset.";
+      }
+    });
+    goalInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") proposeBtn.click();
+    });
+
+    presetMenuButton.addEventListener("click", () => {
+      setPresetMenuOpen(!presetMenu.classList.contains("open"));
+    });
+
+    presetOptionButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        applyPresetKey(button.dataset.sessionKey);
+      });
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!presetMenu.contains(event.target)) {
+        setPresetMenuOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        setPresetMenuOpen(false);
+      }
+    });
+
+    potencySlider.addEventListener("input", () => {
+      updateUI();
+      if (masterGainNode && audioCtx) {
+        const potency = Number(potencySlider.value);
+        const volume = Number(volumeSlider.value);
+        const safeVolume = Math.max(0, Math.min(100, volume)) / 100;
+        masterGainNode.gain.setTargetAtTime((0.035 + potency * 0.006) * safeVolume, audioCtx.currentTime, 0.08);
+        statusEl.textContent = "Playing: " + preset.title + " — potency adjusted for this session.";
+      }
+    });
+    volumeSlider.addEventListener("input", () => {
+      updateUI();
+      if (masterGainNode && audioCtx) {
+        const potency = Number(potencySlider.value);
+        const volume = Number(volumeSlider.value);
+        const safeVolume = Math.max(0, Math.min(100, volume)) / 100;
+        masterGainNode.gain.setTargetAtTime((0.035 + potency * 0.006) * safeVolume, audioCtx.currentTime, 0.08);
+      }
+    });
+    minutesSlider.addEventListener("input", () => {
+      updateUI();
+      if (!audioCtx) updateTimerDisplay(Number(minutesSlider.value) * 60);
+    });
+    focus40Toggle.addEventListener("change", () => updateFocus40State(true));
+    startBtn.addEventListener("click", startAudio);
+    stopBtn.addEventListener("click", () => stopAudio(false));
+    addToPlaylistBtn.addEventListener("click", addCurrentToPlaylist);
+    clearPlaylistBtn.addEventListener("click", clearPlaylist);
+    playPlaylistBtn.addEventListener("click", playPlaylist);
+    previousBtn.addEventListener("click", () => movePlaylist(-1));
+    nextBtn.addEventListener("click", () => movePlaylist(1));
+    saveBtn.addEventListener("click", saveCurrentSession);
+    libraryToggle.addEventListener("click", () => {
+      setLibraryOpen(!library.classList.contains("open"));
+    });
+
+    ensureIntegralSession();
+    playlist = getPlaylist();
+    updateUI();
+    updateFocus40State(false);
+    updateTimerDisplay(Number(minutesSlider.value) * 60);
+    renderLibrary();
+    renderPlaylist();
+    stopBtn.disabled = true;
+  </script>
+</body>
+</html>
