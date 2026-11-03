@@ -346,6 +346,58 @@
       letter-spacing: -0.03em;
     }
 
+    .session-overview {
+      margin: 0 0 16px;
+      padding: 16px;
+      border: 1px solid rgba(94, 234, 212, 0.22);
+      border-radius: 16px;
+      background: linear-gradient(145deg, rgba(29, 105, 108, 0.17), rgba(3, 31, 36, 0.42));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    }
+
+    .overview-kicker {
+      color: #7eeadd;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .overview-summary {
+      margin: 8px 0 14px;
+      color: #d8f4f2;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .overview-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .overview-detail {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px;
+      align-items: baseline;
+      padding-top: 8px;
+      border-top: 1px solid rgba(94, 234, 212, 0.12);
+    }
+
+    .overview-detail span {
+      color: #76a9ad;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .overview-detail strong {
+      color: #c9eeeb;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
     .small-title {
       color: var(--muted);
       font-size: 14px;
@@ -801,24 +853,24 @@
                 <button class="preset-option" type="button" data-session-key="complete alpha session">Complete Alpha Session</button>
                 <button class="preset-option" type="button" data-session-key="complete theta session">Complete Theta Session</button>
                 <button class="preset-option" type="button" data-session-key="complete delta session">Complete Delta Session</button>
-                <button class="preset-option" type="button" data-session-key="brain massage">Brain Massage</button>
-                <button class="preset-option" type="button" data-session-key="brainstorming">Brainstorming</button>
+                <button class="preset-option" type="button" data-session-key="morning activation">Morning Activation</button>
+                <button class="preset-option" type="button" data-session-key="study endurance">Study Endurance</button>
                 <button class="preset-option" type="button" data-session-key="lateral thinking">Lateral Thinking</button>
                 <button class="preset-option" type="button" data-session-key="problem solving">Problem Solving</button>
                 <button class="preset-option" type="button" data-session-key="creativity">Creativity</button>
                 <button class="preset-option" type="button" data-session-key="hypnagogic theta">Hypnagogic Theta</button>
                 <button class="preset-option" type="button" data-session-key="sharper senses and acuity thinking">Sharper Senses &amp; Acuity Thinking</button>
                 <button class="preset-option" type="button" data-session-key="clear brain fog">Clear Brain Fog</button>
-                <button class="preset-option" type="button" data-session-key="focus">Calm Focus</button>
               </div>
             </div>
             <div>
               <div class="preset-group-title">General Sessions</div>
               <div class="preset-options">
-                <button class="preset-option" type="button" data-session-key="integral complete health">Integral &amp; Complete Health</button>
+                <button class="preset-option" type="button" data-session-key="meditation anchor">Meditation Anchor</button>
+                <button class="preset-option" type="button" data-session-key="power nap journey">Power Nap Journey</button>
+                <button class="preset-option" type="button" data-session-key="emotional decompression">Emotional Decompression</button>
+                <button class="preset-option" type="button" data-session-key="body scan">Body Scan</button>
                 <button class="preset-option" type="button" data-session-key="healthy vision">Healthy Vision Comfort</button>
-                <button class="preset-option" type="button" data-session-key="sleep">Deep Rest</button>
-                <button class="preset-option" type="button" data-session-key="stress">Stress Ease</button>
               </div>
             </div>
           </div>
@@ -925,8 +977,23 @@
       </div>
 
       <aside class="card side">
-        <div class="small-title">Proposed preset</div>
+        <div class="small-title">Selected preset</div>
         <h2 id="presetTitle">Healthy Vision Comfort</h2>
+
+        <div class="session-overview" aria-live="polite">
+          <div class="overview-kicker">Session overview</div>
+          <p class="overview-summary" id="overviewSummary"></p>
+          <div class="overview-grid">
+            <div class="overview-detail">
+              <span>Context</span>
+              <strong id="overviewUse"></strong>
+            </div>
+            <div class="overview-detail">
+              <span>Character</span>
+              <strong id="overviewCharacter"></strong>
+            </div>
+          </div>
+        </div>
 
         <div class="wave-box">
           <div class="small-title">Composite wave</div>
@@ -1019,29 +1086,17 @@
         bandPhases: [4, 3.5, 3, 2, 1, 2],
         phaseLabels: ["settling", "slowing", "deep rest", "sleep depth", "lowest drift", "soft close"]
       },
-      "integral complete health": {
-        title: "Integral & Complete Health",
-        recommended: 18,
-        note: "A balanced full-body wellness session: grounding, calm focus, emotional balance, and gentle restoration.",
-        carrier: [174, 285, 396, 432, 528, 639, 741, 852],
-        binaural: 7.83,
-        ambient: 0.27,
-        morphic: 0.13,
-        scalar: 0.10,
-        morphicBase: 128,
-        scalarCarrier: 136.1
-      },
-      "complete health": {
-        title: "Integral & Complete Health",
-        recommended: 18,
-        note: "A balanced full-body wellness session: grounding, calm focus, emotional balance, and gentle restoration.",
-        carrier: [174, 285, 396, 432, 528, 639, 741, 852],
-        binaural: 7.83,
-        ambient: 0.27,
-        morphic: 0.13,
-        scalar: 0.10,
-        morphicBase: 128,
-        scalarCarrier: 136.1
+      "meditation anchor": {
+        title: "Meditation Anchor",
+        recommended: 20,
+        note: "A steady, low-motion session built around a 7.5 Hz offset and a restrained tonal bed for simple, repeatable meditation practice.",
+        carrier: [174, 285, 396, 432, 528],
+        binaural: 7.5,
+        ambient: 0.28,
+        morphic: 0.08,
+        scalar: 0.06,
+        morphicBase: 108,
+        scalarCarrier: 128
       },
       "healthy vision": {
         title: "Healthy Vision Comfort",
@@ -1053,25 +1108,35 @@
         morphic: 0.12,
         scalar: 0.09
       },
-      sleep: {
-        title: "Deep Rest",
-        recommended: 20,
-        note: "Soft low-frequency binaural layer for relaxation before sleep.",
-        carrier: [174, 285, 432],
-        binaural: 3.5,
-        ambient: 0.34,
-        morphic: 0.09,
-        scalar: 0.06
-      },
-      focus: {
-        title: "Calm Focus",
-        recommended: 15,
-        note: "Balanced tone mix for quiet concentration.",
-        carrier: [417, 432, 528, 741],
+      "power nap journey": {
+        title: "Power Nap Journey",
+        recommended: 22,
+        note: "A timed descent from relaxed alpha through theta to light delta, followed by a gradual return toward wakeful alpha.",
+        carrier: [174, 285, 396, 432, 528],
         binaural: 10,
-        ambient: 0.22,
-        morphic: 0.10,
-        scalar: 0.11
+        ambient: 0.34,
+        morphic: 0.07,
+        scalar: 0.05,
+        morphicBase: 96,
+        scalarCarrier: 111,
+        phaseMode: "nap",
+        bandPhases: [10, 8, 6, 4, 6, 10],
+        phaseLabels: ["settling", "letting go", "drifting", "quiet rest", "returning", "wakeful close"]
+      },
+      "study endurance": {
+        title: "Study Endurance",
+        recommended: 30,
+        note: "A longer focus session that cycles gently between alpha and low-beta offsets to keep the sound from becoming static.",
+        carrier: [285, 417, 432, 528, 639, 741],
+        binaural: 10,
+        ambient: 0.19,
+        morphic: 0.09,
+        scalar: 0.09,
+        morphicBase: 128,
+        scalarCarrier: 144,
+        phaseMode: "study",
+        bandPhases: [10, 12, 14, 12, 10, 12],
+        phaseLabels: ["settling in", "steady work", "active focus", "reset", "calm focus", "sustained close"]
       },
       "lateral thinking": {
         title: "Lateral Thinking",
@@ -1160,39 +1225,132 @@
         morphicBase: 118,
         scalarCarrier: 136.1
       },
-      "brain massage": {
-        title: "Brain Massage",
-        recommended: 12,
-        note: "A soft mental reset preset for a relaxed, massaging headspace with slow alpha/theta-style movement.",
+      "body scan": {
+        title: "Body Scan",
+        recommended: 18,
+        note: "A grounded, low-motion session with soft pulsing intended to accompany slow attention through the body.",
         carrier: [174, 285, 396, 432, 528],
-        binaural: 7,
-        ambient: 0.32,
-        morphic: 0.09,
-        scalar: 0.08,
+        binaural: 7.83,
+        ambient: 0.31,
+        morphic: 0.07,
+        scalar: 0.07,
         morphicBase: 108,
         scalarCarrier: 111
       },
-      brainstorming: {
-        title: "Brainstorming",
-        recommended: 18,
-        note: "A lively idea-generation preset for open association, playful connections, and more creative possibilities.",
-        carrier: [396, 417, 528, 639, 741, 852],
-        binaural: 6,
-        ambient: 0.26,
-        morphic: 0.14,
-        scalar: 0.10,
-        morphicBase: 124,
-        scalarCarrier: 144
+      "morning activation": {
+        title: "Morning Activation",
+        recommended: 16,
+        note: "A gradual rise from relaxed alpha toward low beta, then a softer landing for a bright but comfortable start.",
+        carrier: [285, 417, 432, 528, 639, 741],
+        binaural: 8,
+        ambient: 0.18,
+        morphic: 0.09,
+        scalar: 0.09,
+        morphicBase: 132,
+        scalarCarrier: 144,
+        phaseMode: "activation",
+        bandPhases: [8, 10, 12, 14, 16, 12],
+        phaseLabels: ["gentle opening", "waking", "clear attention", "active focus", "bright peak", "steady landing"]
       },
-      stress: {
-        title: "Stress Ease",
-        recommended: 10,
-        note: "Gentle tones and slow modulation for a calmer listening session.",
+      "emotional decompression": {
+        title: "Emotional Decompression",
+        recommended: 15,
+        note: "A warm, slowly moving alpha-theta blend with a generous ambient bed for easing out of a demanding day.",
         carrier: [174, 396, 432, 528, 639],
         binaural: 6,
-        ambient: 0.30,
-        morphic: 0.11,
-        scalar: 0.08
+        ambient: 0.33,
+        morphic: 0.09,
+        scalar: 0.06,
+        morphicBase: 108,
+        scalarCarrier: 128
+      }
+    };
+
+    const SESSION_GUIDES = {
+      "Gamma Complete Session": {
+        summary: "A wide-ranging, active session with evolving gamma phases and a brighter tonal palette.",
+        use: "Short, attentive listening when you want an energetic soundscape",
+        character: "Bright · layered · active"
+      },
+      "Complete Alpha Session": {
+        summary: "A gradual alpha progression that balances calm spaciousness with a gently awake finish.",
+        use: "Reading, relaxed focus, journaling, or unwinding while awake",
+        character: "Calm · open · balanced"
+      },
+      "Complete Theta Session": {
+        summary: "A slow descent through the theta range, followed by a soft return for an unhurried close.",
+        use: "Meditation, visualization, quiet reflection, or pre-sleep listening",
+        character: "Dreamlike · spacious · inward"
+      },
+      "Complete Delta Session": {
+        summary: "The slowest complete session, shaped as a gentle progression toward very low rhythmic movement.",
+        use: "Bedtime or deep rest only; not when alertness is needed",
+        character: "Deep · minimal · sleep-oriented"
+      },
+      "Meditation Anchor": {
+        summary: "A deliberately steady session with minimal movement, designed to provide a consistent sonic point of return.",
+        use: "Breath practice, seated meditation, or quiet observation",
+        character: "Steady · centered · uncluttered"
+      },
+      "Healthy Vision Comfort": {
+        summary: "A light, comfortable preset with clear upper tones and restrained rhythmic movement.",
+        use: "A quiet pause after visually demanding activities",
+        character: "Light · clear · gentle"
+      },
+      "Power Nap Journey": {
+        summary: "A complete down-and-back journey that moves toward light delta before returning to a more wakeful finish.",
+        use: "A planned short rest when you can wake gradually afterward",
+        character: "Descending · quiet · restorative"
+      },
+      "Study Endurance": {
+        summary: "A longer session that alternates calm and active focus phases to create variety during sustained work.",
+        use: "Long reading, study, writing, or desk-work blocks",
+        character: "Sustained · structured · gently varied"
+      },
+      "Lateral Thinking": {
+        summary: "A gently moving mix with enough variation to support a change of perspective and open-ended thought.",
+        use: "Idea exploration, reframing, and creative problem approaches",
+        character: "Fluid · curious · shifting"
+      },
+      "Problem Solving": {
+        summary: "A firmer, more structured listening profile with restrained ambience and a clear rhythmic center.",
+        use: "Planning, analysis, decisions, and focused problem work",
+        character: "Ordered · alert · deliberate"
+      },
+      "Creativity": {
+        summary: "A warm, spacious blend with gentle movement and a wider ambient bed for imaginative work.",
+        use: "Sketching, writing, composing, and free-form ideation",
+        character: "Warm · expansive · playful"
+      },
+      "Hypnagogic Theta": {
+        summary: "A slow and spacious preset for the quiet boundary between wakefulness and sleep.",
+        use: "Bedtime, eyes-closed rest, or observing pre-sleep imagery",
+        character: "Hushed · floating · dreamlike"
+      },
+      "Sharper Senses & Acuity Thinking": {
+        summary: "A crisp, brighter session that combines alert rhythmic movement with detailed upper tones.",
+        use: "Brief periods of attentive listening and mentally active tasks",
+        character: "Crisp · alert · detailed"
+      },
+      "Clear Brain Fog": {
+        summary: "A grounded opening with progressively brighter carriers for a cleaner, more awake listening feel.",
+        use: "Morning resets, transitions, or regaining momentum",
+        character: "Fresh · rising · clear"
+      },
+      "Body Scan": {
+        summary: "A grounded, low-motion soundscape intended to accompany slow, sequential attention through the body.",
+        use: "Body-scan meditation, gentle stretching, or lying-down relaxation",
+        character: "Grounded · slow · embodied"
+      },
+      "Morning Activation": {
+        summary: "A smooth rise from relaxed alpha toward low beta, followed by a controlled landing rather than an abrupt stop.",
+        use: "Morning routines, starting work, or shifting out of sluggishness",
+        character: "Rising · bright · composed"
+      },
+      "Emotional Decompression": {
+        summary: "A warm alpha-theta blend with broad ambience and restrained rhythmic detail for a softer transition out of activity.",
+        use: "After-work unwinding, journaling, or a quiet personal reset",
+        character: "Warm · spacious · releasing"
       }
     };
 
@@ -1201,19 +1359,19 @@
       "complete alpha session",
       "complete theta session",
       "complete delta session",
-      "brain massage",
-      "brainstorming",
+      "morning activation",
+      "study endurance",
       "lateral thinking",
       "problem solving",
       "creativity",
       "hypnagogic theta",
       "sharper senses and acuity thinking",
       "clear brain fog",
-      "focus",
-      "integral complete health",
+      "meditation anchor",
+      "power nap journey",
+      "emotional decompression",
+      "body scan",
       "healthy vision",
-      "sleep",
-      "stress"
     ];
 
     let preset = GOAL_PRESETS["gamma complete session"];
@@ -1248,6 +1406,9 @@
     const recommendedText = document.getElementById("recommendedText");
     const presetTitle = document.getElementById("presetTitle");
     const presetNote = document.getElementById("presetNote");
+    const overviewSummary = document.getElementById("overviewSummary");
+    const overviewUse = document.getElementById("overviewUse");
+    const overviewCharacter = document.getElementById("overviewCharacter");
     const waveLabel = document.getElementById("waveLabel");
     const startBtn = document.getElementById("startBtn");
     const stopBtn = document.getElementById("stopBtn");
@@ -1331,7 +1492,8 @@
     }
 
     function applyPresetListeningDefaults() {
-      const gentleBandSession = ["alpha", "theta", "delta"].includes(preset.phaseMode) || preset.title === "Hypnagogic Theta";
+      const gentleBandSession = ["alpha", "theta", "delta", "nap"].includes(preset.phaseMode) ||
+        ["Hypnagogic Theta", "Meditation Anchor", "Emotional Decompression", "Body Scan"].includes(preset.title);
       if (gentleBandSession) {
         focus40Toggle.checked = false;
         updateFocus40State(false);
@@ -1356,7 +1518,7 @@
     function getPreset(goal) {
       const clean = goal.trim().toLowerCase();
 
-      if (!clean) return GOAL_PRESETS.stress;
+      if (!clean) return GOAL_PRESETS["emotional decompression"];
       if (GOAL_PRESETS[clean]) return GOAL_PRESETS[clean];
 
       if (
@@ -1394,7 +1556,59 @@
         clean.includes("mental physical") ||
         clean.includes("salud integral")
       ) {
-        return GOAL_PRESETS["integral complete health"];
+        return GOAL_PRESETS["meditation anchor"];
+      }
+
+      if (
+        clean.includes("morning") ||
+        clean.includes("wake up") ||
+        clean.includes("activation") ||
+        clean.includes("start my day")
+      ) {
+        return GOAL_PRESETS["morning activation"];
+      }
+
+      if (
+        clean.includes("study endurance") ||
+        clean.includes("long study") ||
+        clean.includes("sustained work") ||
+        clean.includes("work session")
+      ) {
+        return GOAL_PRESETS["study endurance"];
+      }
+
+      if (
+        clean.includes("power nap") ||
+        clean.includes("short nap") ||
+        clean === "nap"
+      ) {
+        return GOAL_PRESETS["power nap journey"];
+      }
+
+      if (
+        clean.includes("meditation") ||
+        clean.includes("breath practice") ||
+        clean.includes("anchor") ||
+        clean.includes("mindfulness")
+      ) {
+        return GOAL_PRESETS["meditation anchor"];
+      }
+
+      if (
+        clean.includes("body scan") ||
+        clean.includes("somatic") ||
+        clean.includes("progressive relaxation")
+      ) {
+        return GOAL_PRESETS["body scan"];
+      }
+
+      if (
+        clean.includes("emotional decompression") ||
+        clean.includes("unwind") ||
+        clean.includes("after work") ||
+        clean.includes("release tension")
+      ) {
+        return GOAL_PRESETS["emotional decompression"];
       }
 
       if (
@@ -1424,7 +1638,7 @@
         clean.includes("idea generation") ||
         clean.includes("generate ideas")
       ) {
-        return GOAL_PRESETS.brainstorming;
+        return GOAL_PRESETS.creativity;
       }
 
       if (
@@ -1480,7 +1694,7 @@
         clean.includes("relax my head") ||
         clean.includes("head massage")
       ) {
-        return GOAL_PRESETS["brain massage"];
+        return GOAL_PRESETS["emotional decompression"];
       }
 
       if (
@@ -1509,49 +1723,44 @@
         };
       }
       if (clean.includes("sleep") || clean.includes("dream") || clean.includes("dormir")) {
-        return {
-          title: "Deep Rest",
-          recommended: 20,
-          note: "Lower, slower tones with a delta-style binaural offset.",
-          carrier: [174, 285, 396, 432],
-          binaural: 3.5,
-          ambient: 0.34,
-          morphic: 0.08,
-          scalar: 0.06,
-          morphicBase: 96,
-          scalarCarrier: 111
-        };
+        return GOAL_PRESETS["hypnagogic theta"];
       }
       if (clean.includes("focus") || clean.includes("study") || clean.includes("concentration")) {
-        return {
-          title: "Calm Focus",
-          recommended: 15,
-          note: "Clearer upper-mid tone set with a soft alpha-style binaural offset.",
-          carrier: [417, 528, 639, 741],
-          binaural: 10,
-          ambient: 0.20,
-          morphic: 0.11,
-          scalar: 0.12,
-          morphicBase: 128,
-          scalarCarrier: 144
-        };
+        return GOAL_PRESETS["study endurance"];
       }
       if (clean.includes("stress") || clean.includes("anxiety") || clean.includes("calm")) {
-        return {
-          title: "Stress Ease",
-          recommended: 10,
-          note: "Grounding solfeggio set with slow, comfortable movement.",
-          carrier: [174, 396, 432, 528, 639],
-          binaural: 6,
-          ambient: 0.30,
-          morphic: 0.10,
-          scalar: 0.08,
-          morphicBase: 108,
-          scalarCarrier: 128
-        };
+        return GOAL_PRESETS["emotional decompression"];
       }
 
       return makeCustomPreset(goal);
+    }
+
+    function getSessionGuide(currentPreset) {
+      if (SESSION_GUIDES[currentPreset.title]) return SESSION_GUIDES[currentPreset.title];
+
+      const beat = Number(currentPreset.binaural) || 8;
+      let use = "Quiet personal listening and experimentation";
+      let character = "Balanced · personal · exploratory";
+
+      if (beat <= 4) {
+        use = "Bedtime or deep rest; not when alertness is required";
+        character = "Slow · deep · minimal";
+      } else if (beat <= 8) {
+        use = "Meditation, reflection, visualization, or winding down";
+        character = "Spacious · inward · unhurried";
+      } else if (beat <= 12) {
+        use = "Relaxed concentration, reading, or creative work";
+        character = "Calm · steady · open";
+      } else {
+        use = "Brief attentive listening or mentally active tasks";
+        character = "Bright · active · focused";
+      }
+
+      return {
+        summary: currentPreset.note || "A personalized soundscape created from the words in your intention.",
+        use,
+        character
+      };
     }
 
     function updateUI() {
@@ -1568,10 +1777,14 @@
 
       presetTitle.textContent = preset.title;
       presetNote.textContent = preset.note;
+      const sessionGuide = getSessionGuide(preset);
+      overviewSummary.textContent = sessionGuide.summary;
+      overviewUse.textContent = sessionGuide.use;
+      overviewCharacter.textContent = sessionGuide.character;
       syncPresetMenu();
       recommendedText.textContent = "Recommended for this preset: " + preset.recommended + " minutes.";
 
-      const binauralDescription = ["alpha", "theta", "delta"].includes(preset.phaseMode)
+      const binauralDescription = Array.isArray(preset.bandPhases)
         ? preset.phaseMode + " sweep " + preset.bandPhases.join(" → ") + " Hz"
         : "binaural " + preset.binaural + " Hz";
 
@@ -1651,7 +1864,7 @@
           } else {
             phaseNote.textContent = "Gamma phase 5: full 40–100 Hz blend";
           }
-        } else if (["alpha", "theta", "delta"].includes(preset.phaseMode) && audioCtx) {
+        } else if (Array.isArray(preset.bandPhases) && audioCtx) {
           const phases = preset.bandPhases;
           const elapsed = Math.max(0, totalSeconds - remaining);
           const phaseIndex = Math.min(phases.length - 1, Math.floor((elapsed / totalSeconds) * phases.length));
@@ -1882,7 +2095,7 @@
       left.start();
       right.start();
 
-      if (["alpha", "theta", "delta"].includes(preset.phaseMode)) {
+      if (Array.isArray(preset.bandPhases)) {
         const phases = preset.bandPhases;
         const phaseDuration = totalSeconds / phases.length;
         const transitionSeconds = Math.min(4, phaseDuration * 0.12);
@@ -2002,7 +2215,7 @@
       if (phaseNote) {
         phaseNote.textContent = preset.phaseMode === "gamma"
           ? "Gamma phase 1: 40–48 Hz low gamma opening"
-          : ["alpha", "theta", "delta"].includes(preset.phaseMode)
+          : Array.isArray(preset.bandPhases)
             ? preset.phaseMode.charAt(0).toUpperCase() + preset.phaseMode.slice(1) + " phase 1: " + preset.bandPhases[0] + " Hz · " + preset.phaseLabels[0]
             : "Phase: continuous blend";
       }
@@ -2283,18 +2496,30 @@
       });
     }
 
-    function ensureIntegralSession() {
+    function ensureStarterSessions() {
       let sessions = getSavedSessions();
       const originalJSON = JSON.stringify(sessions);
-      sessions = sessions.filter(session => session.title !== "Acuity Senses");
+      const replacedTitles = [
+        "Acuity Senses",
+        "Integral & Complete Health",
+        "Brain Massage",
+        "Brainstorming",
+        "Calm Focus",
+        "Deep Rest",
+        "Stress Ease"
+      ];
+      sessions = sessions.filter(session => !replacedTitles.includes(session.title));
       const starterSessions = [
         { goal: "Gamma Complete Session", key: "gamma complete session", potency: 4 },
         { goal: "Complete Alpha Session", key: "complete alpha session", potency: 3 },
         { goal: "Complete Theta Session", key: "complete theta session", potency: 3 },
         { goal: "Complete Delta Session", key: "complete delta session", potency: 2 },
-        { goal: "Integral complete health", key: "integral complete health", potency: 5 },
-        { goal: "Brain Massage", key: "brain massage", potency: 3 },
-        { goal: "Brainstorming", key: "brainstorming", potency: 4 },
+        { goal: "Morning Activation", key: "morning activation", potency: 4 },
+        { goal: "Study Endurance", key: "study endurance", potency: 4 },
+        { goal: "Meditation Anchor", key: "meditation anchor", potency: 3 },
+        { goal: "Power Nap Journey", key: "power nap journey", potency: 2 },
+        { goal: "Emotional Decompression", key: "emotional decompression", potency: 3 },
+        { goal: "Body Scan", key: "body scan", potency: 3 },
         { goal: "Lateral Thinking", key: "lateral thinking", potency: 4 },
         { goal: "Problem Solving", key: "problem solving", potency: 5 },
         { goal: "Creativity", key: "creativity", potency: 4 },
@@ -2419,7 +2644,7 @@
       setLibraryOpen(!library.classList.contains("open"));
     });
 
-    ensureIntegralSession();
+    ensureStarterSessions();
     playlist = getPlaylist();
     updateUI();
     updateFocus40State(false);
